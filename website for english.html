@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #2980b9; /* Darker shade of blue background color */
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+            text-align: center; /* Center-align text */
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            display: block;
+            margin: 20px auto; /* Center the canvas */
+            border: 2px solid #ffffff; /* White border for the PONG canvas */
+        }
+    </style>
+    <title>QR Code Message & PONG Game</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Hey there Mrs. Schildgen!</h1>
+        <p>If you're reading this message, that means you probably scanned the QR code!</p>
+        <p>I didn't have anything to take the picture with - so I made a fun website to play the classic game of 'PONG'!</p>
+    </div>
+
+    <canvas id="pongCanvas" width="400" height="300"></canvas>
+
+    <script>
+        // JavaScript code for PONG game
+        const canvas = document.getElementById("pongCanvas");
+        const ctx = canvas.getContext("2d");
+    
+        // Paddle dimensions
+        const paddleWidth = 10, paddleHeight = 60;
+    
+        // Initial paddle positions
+        let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
+        let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
+    
+        // Ball dimensions and initial position
+        let ballSize = 10;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 5;
+        let ballSpeedY = 5;
+    
+        // Keyboard controls
+        let upKeyPressed = false;
+        let downKeyPressed = false;
+    
+        // Event listeners for key presses
+        document.addEventListener("keydown", function (event) {
+            switch (event.key) {
+                case "w":
+                    upKeyPressed = true;
+                    break;
+                case "s":
+                    downKeyPressed = true;
+                    break;
+            }
+        });
+    
+        // Event listeners for key releases
+        document.addEventListener("keyup", function (event) {
+            switch (event.key) {
+                case "w":
+                    upKeyPressed = false;
+                    break;
+                case "s":
+                    downKeyPressed = false;
+                    break;
+            }
+        });
+    
+        // Function to draw paddles
+        function drawPaddle(x, y) {
+            ctx.fillStyle = "#ffffff"; // White color for paddles
+            ctx.fillRect(x, y, paddleWidth, paddleHeight);
+        }
+    
+        // Function to draw the ball
+        function drawBall(x, y) {
+            ctx.fillStyle = "#ffffff"; // White color for the ball
+            ctx.beginPath();
+            ctx.arc(x, y, ballSize, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+        }
+    
+        // Function to update game state and draw
+        function update() {
+            // Update paddle positions based on key presses
+            if (upKeyPressed && leftPaddleY > 0) {
+                leftPaddleY -= 7;
+            }
+            if (downKeyPressed && leftPaddleY < canvas.height - paddleHeight) {
+                leftPaddleY += 7;
+            }
+    
+            // Update ball position
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+    
+            // Ball collisions with walls
+            if (ballY + ballSize > canvas.height || ballY - ballSize < 0) {
+                ballSpeedY = -ballSpeedY;
+            }
+    
+            // Ball collisions with paddles
+            if (
+                (ballX - ballSize < paddleWidth && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) ||
+                (ballX + ballSize > canvas.width - paddleWidth && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight)
+            ) {
+                ballSpeedX = -ballSpeedX;
+            }
+    
+            // Check if the ball goes past the left paddle
+            if (ballX - ballSize < 0) {
+                // Reset ball position
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+                // Randomize ball direction
+                ballSpeedX = Math.random() > 0.5 ? 5 : -5;
+                ballSpeedY = Math.random() > 0.5 ? 5 : -5;
+            }
+    
+            // Move right paddle (you can add your own logic for paddle movement)
+            rightPaddleY = ballY - paddleHeight / 2;
+    
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            // Draw paddles and ball
+            drawPaddle(0, leftPaddleY);
+            drawPaddle(canvas.width - paddleWidth, rightPaddleY);
+            drawBall(ballX, ballY);
+    
+            // Draw instructions
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText("Use 'W' and 'S' keys to control the left paddle", 10, 20);
+    
+            // Request next animation frame
+            requestAnimationFrame(update);
+        }
+    
+        // Call the update function to start the game loop
+        update();
+    </script>
+    
+    
+</body>
+</html>
